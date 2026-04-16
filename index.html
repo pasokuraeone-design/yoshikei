@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ヨシケイ最適注文シミュレーター</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-icon">🍲</div>
+            <div>
+                <h1>ヨシケイお得計算アプリ</h1>
+                <p>バラ購入とコース購入の最安パターンを自動比較</p>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- 設定カード -->
+            <section class="card glass-card">
+                <div class="card-header">
+                    <h2>📅 今週の必要人数</h2>
+                    <p class="subtitle">各曜日にご飯を食べる人数を選択</p>
+                </div>
+                <div class="card-content">
+                    <div class="days-grid">
+                        <!-- 月曜〜土曜の人数入力 -->
+                        <div class="day-input">
+                            <label>月曜日</label>
+                            <select id="p-mon" class="person-select">
+                                <option value="2">2人用</option>
+                                <option value="3">3人用</option>
+                                <option value="4">4人用</option>
+                            </select>
+                        </div>
+                        <div class="day-input">
+                            <label>火曜日</label>
+                            <select id="p-tue" class="person-select">
+                                <option value="2">2人用</option>
+                                <option value="3">3人用</option>
+                                <option value="4">4人用</option>
+                            </select>
+                        </div>
+                        <div class="day-input">
+                            <label>水曜日</label>
+                            <select id="p-wed" class="person-select">
+                                <option value="2">2人用</option>
+                                <option value="3">3人用</option>
+                                <option value="4">4人用</option>
+                            </select>
+                        </div>
+                        <div class="day-input">
+                            <label>木曜日</label>
+                            <select id="p-thu" class="person-select">
+                                <option value="2">2人用</option>
+                                <option value="3">3人用</option>
+                                <option value="4">4人用</option>
+                            </select>
+                        </div>
+                        <div class="day-input">
+                            <label>金曜日</label>
+                            <select id="p-fri" class="person-select">
+                                <option value="2">2人用</option>
+                                <option value="3">3人用</option>
+                                <option value="4">4人用</option>
+                            </select>
+                        </div>
+                        <div class="day-input">
+                            <label>土曜日</label>
+                            <select id="p-sat" class="person-select">
+                                <option value="2">2人用</option>
+                                <option value="3">3人用</option>
+                                <option value="4">4人用</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 価格入力カード -->
+            <section class="card glass-card">
+                <div class="card-header">
+                    <div class="header-title-toggle">
+                        <h2>💰 今週のヨシケイ価格設定</h2>
+                        <button id="toggle-prices-btn" class="toggle-btn">開く ▼</button>
+                    </div>
+                    <p class="subtitle">カタログに記載の価格を入力してください（入力は自動保存されます）</p>
+                </div>
+                <div class="card-content" id="prices-content">
+                    
+                    <h3 class="section-title">📦 コース価格（1週間）</h3>
+                    <div class="price-table courses-table">
+                        <div class="table-row table-header">
+                            <div>コース種類</div>
+                            <div>2人用</div>
+                            <div>3人用</div>
+                            <div>4人用</div>
+                        </div>
+                        <div class="table-row">
+                            <div>月〜金 (5日間)</div>
+                            <div><input type="number" id="c5-2" placeholder="7460"></div>
+                            <div><input type="number" id="c5-3" placeholder="9340"></div>
+                            <div><input type="number" id="c5-4" placeholder="12400"></div>
+                        </div>
+                        <div class="table-row">
+                            <div>月〜土 (6日間)</div>
+                            <div><input type="number" id="c6-2" placeholder="8960"></div>
+                            <div><input type="number" id="c6-3" placeholder="11210"></div>
+                            <div><input type="number" id="c6-4" placeholder="14800"></div>
+                        </div>
+                    </div>
+
+                    <h3 class="section-title">🍱 バラ購入価格（日替わり）</h3>
+                    <div class="price-table daily-table">
+                        <div class="table-row table-header">
+                            <div>曜日</div>
+                            <div>2人用</div>
+                            <div>3人用</div>
+                            <div>4人用</div>
+                        </div>
+                        <!-- 各曜日 -->
+                        <div class="table-row">
+                            <div>月曜日</div>
+                            <div><input type="number" id="d-mon-2" placeholder="1590"></div>
+                            <div><input type="number" id="d-mon-3" placeholder="1990"></div>
+                            <div><input type="number" id="d-mon-4" placeholder="2540"></div>
+                        </div>
+                        <div class="table-row">
+                            <div>火曜日</div>
+                            <div><input type="number" id="d-tue-2" placeholder="1620"></div>
+                            <div><input type="number" id="d-tue-3" placeholder="2030"></div>
+                            <div><input type="number" id="d-tue-4" placeholder="2580"></div>
+                        </div>
+                        <div class="table-row">
+                            <div>水曜日</div>
+                            <div><input type="number" id="d-wed-2" placeholder="1570"></div>
+                            <div><input type="number" id="d-wed-3" placeholder="1960"></div>
+                            <div><input type="number" id="d-wed-4" placeholder="2500"></div>
+                        </div>
+                        <div class="table-row">
+                            <div>木曜日</div>
+                            <div><input type="number" id="d-thu-2" placeholder="1600"></div>
+                            <div><input type="number" id="d-thu-3" placeholder="2000"></div>
+                            <div><input type="number" id="d-thu-4" placeholder="2550"></div>
+                        </div>
+                        <div class="table-row">
+                            <div>金曜日</div>
+                            <div><input type="number" id="d-fri-2" placeholder="1550"></div>
+                            <div><input type="number" id="d-fri-3" placeholder="1950"></div>
+                            <div><input type="number" id="d-fri-4" placeholder="2400"></div>
+                        </div>
+                        <div class="table-row">
+                            <div>土曜日</div>
+                            <div><input type="number" id="d-sat-2" placeholder="1500"></div>
+                            <div><input type="number" id="d-sat-3" placeholder="1850"></div>
+                            <div><input type="number" id="d-sat-4" placeholder="2300"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 結果カード -->
+            <section class="result-section">
+                <h2 class="result-heading">比較結果</h2>
+                
+                <div class="results-grid">
+                    <!-- パターン1 -->
+                    <div class="result-card" id="card-pattern-a">
+                        <div class="pattern-badge">パターンA</div>
+                        <div class="pattern-title">毎日バラで購入</div>
+                        <div class="pattern-desc">必要な人数分を毎日指定して買う</div>
+                        <div class="pattern-price"><span id="res-a-price">0</span><span class="currency">円</span></div>
+                        <div class="pattern-diff" id="res-a-diff"></div>
+                    </div>
+                    
+                    <!-- パターン2 -->
+                    <div class="result-card" id="card-pattern-b">
+                        <div class="pattern-badge">パターンB</div>
+                        <div class="pattern-title">5日間コース + 土曜バラ</div>
+                        <div class="pattern-desc">最大必要人数(<span id="res-b-max">2</span>人)の5日間コースと土曜のバラ</div>
+                        <div class="pattern-price"><span id="res-b-price">0</span><span class="currency">円</span></div>
+                        <div class="pattern-diff" id="res-b-diff"></div>
+                    </div>
+
+                    <!-- パターン3 -->
+                    <div class="result-card" id="card-pattern-c">
+                        <div class="pattern-badge">パターンC</div>
+                        <div class="pattern-title">6日間コース (月〜土)</div>
+                        <div class="pattern-desc">最大必要人数(<span id="res-c-max">2</span>人)の6日間コース</div>
+                        <div class="pattern-price"><span id="res-c-price">0</span><span class="currency">円</span></div>
+                        <div class="pattern-diff" id="res-c-diff"></div>
+                    </div>
+                </div>
+
+                <div class="recommendation-box" id="recommendation-box">
+                    <div class="rec-icon">✨</div>
+                    <div class="rec-text">
+                        <h3 id="rec-title">おすすめの買い方</h3>
+                        <p id="rec-desc">数値を入力すると、こちらに一番お得なプランが表示されます。</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
