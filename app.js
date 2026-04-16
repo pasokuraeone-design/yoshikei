@@ -224,4 +224,117 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // --- Auto Input Logic (コピペ一発入力機能) ---
+    const autoInputBtn = document.getElementById('auto-input-btn');
+    const autoInputText = document.getElementById('auto-input-text');
+    const autoInputMessage = document.getElementById('auto-input-message');
+
+    if (autoInputBtn && autoInputText) {
+        autoInputBtn.addEventListener('click', () => {
+            const rawText = autoInputText.value;
+            if (!rawText.trim()) {
+                showMessage('テキストが入力されていません。', 'error');
+                return;
+            }
+            
+            const results = parseYoshikeiText(rawText);
+            
+            if (results.count > 0) {
+                saveData();
+                calculate();
+                showMessage(`${results.count}個の価格を自動入力しました！正しく入力されているか確認してください。`, 'success');
+            } else {
+                showMessage('金額が見つかりませんでした。テキストの内容を確認してください。', 'error');
+            }
+        });
+    }
+
+    function showMessage(text, type) {
+        autoInputMessage.textContent = text;
+        autoInputMessage.className = `message-box ${type}`;
+        setTimeout(() => {
+            autoInputMessage.classList.add('hidden');
+        }, 5000);
+    }
+
+    function parseYoshikeiText(text) {
+        let count = 0;
+        
+        // 正規化（全角数値を半角に、カンマや不要な記号を削除）
+        const normalized = text
+            .replace(/,/g, '')
+            .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 0xFEE0))
+            .replace(/円/g, '');
+
+        // 行ごとに分割
+        const lines = normalized.split('\n');
+
+        const dayMap = {
+            '月': 'mon', '火': 'tue', '水': 'wed', 
+            '木': 'thu', '金': 'fri', '土': 'sat'
+        };
+
+        for (let line of lines) {
+            if (!line.trim()) continue;
+            
+            // 行の中に含まれる「人数」を抽出（例: "2人用", "3人"）
+            const personsToFind = [];
+            if (line.includes('2人')) personsToFind.push(2);
+            if (line.includes('3人')) personsToFind.push(3);
+            if (line.includes('4人')) personsToFind.push(4);
+            
+            // 価格らしき数字（4桁〜5桁）を抽出
+            const numbers = [...line.matchAll(/(\d{4,5})/g)].map(m => parseInt(m[1]));
+            
+            if (numbers.length === 0) continue; // 価格がなければスキップ
+
+            // --- コース価格の判定 ---
+            if (line.match(/5日間|月[〜\-~]金|コース/)) {
+                personsToFind.forEach((size, index) => {
+                    if (numbers[index]) {
+                        const inputEl = document.getElementById(`c5-${size}`);
+                        if (inputEl) {
+                            inputEl.value = numbers[index];
+                            count++;
+                        }
+                    }
+                });
+                continue;
+            }
+
+            if (line.match(/6日間|月[〜\-~]土/)) {
+                personsToFind.forEach((size, index) => {
+                    if (numbers[index]) {
+                        const inputEl = document.getElementById(`c6-${size}`);
+                        if (inputEl) {
+                            inputEl.value = numbers[index];
+                            count++;
+                        }
+                    }
+                });
+                continue;
+            }
+
+            // --- 日別（バラ）価格の判定 ---
+            // ※「月曜」などの文字列が含まれているかチェック
+            for (const jpDay of ['月', '火', '水', '木', '金', '土']) {
+                if (line.indexOf(`${jpDay}曜`) !== -1 || (line.indexOf(jpDay) !== -1 && line.length < 20)) {
+                    const enDay = dayMap[jpDay];
+                    personsToFind.forEach((size, index) => {
+                        if (numbers[index]) {
+                            const inputEl = document.getElementById(`d-${enDay}-${size}`);
+                            if (inputEl) {
+                                inputEl.value = numbers[index];
+                                count++;
+                            }
+                        }
+                    });
+                    break;
+                }
+            }
+        }
+        
+        return { count };
+    }
+
 });
